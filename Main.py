@@ -6,11 +6,10 @@ import pyqtgraph as pg
 import numpy
 import time
 from math import *
-import cProfile
+import cProfile  # lib utilisee pour le profiling
 
 from App import App
 
-# init serial
 ser = serial.Serial('com8', 2000000)
 
 app = App()

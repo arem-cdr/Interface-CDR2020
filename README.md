@@ -22,7 +22,7 @@ Ce code servira à suivre en temps réel les variables internes du robot. Il tou
 **:memo: Fonctionnement du code :**
 -
 
-- Le rendu graphique est gérée par l'extension pyqtGraph. Cf la documentation de pyqtGraph pour plus d'infos.
+- Le rendu graphique est gérée par l'extension pyqtGraph. Cf http://www.pyqtgraph.org/documentation/index.html de pyqtGraph pour plus d'infos.
 - Afin de rendre le code capable de s'adapter à toutes les données entrantes (raspi connectée à n'importe quelle carte ou bug de com), j'ai divisé les données entrantes sur la com en "séquences". Une séquence suivra toujours ce shéma : 
 
 | Code de la séquence < 0 | Data ... | -1 |

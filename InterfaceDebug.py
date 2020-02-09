@@ -3,6 +3,7 @@ from pyqtgraph.Qt import QtGui, QtCore
 import pyqtgraph as pg
 
 from PathfindingPlot import PathfindingPlot
+from AsserPlot import AsserPlot
 
 
 class InterfaceDebug:
@@ -13,14 +14,23 @@ class InterfaceDebug:
         self.layout = QtGui.QGridLayout()
         self.win.setLayout(self.layout)
 
+        # creation des graphiques
         self.pathfindingPlot = PathfindingPlot()
+        self.asserPlot = AsserPlot()
 
+        # ajout des graphiques au layout
         self.layout.addWidget(
             self.pathfindingPlot.__getPlot__(),
             self.pathfindingPlot.__getPosInLayout__()[0],
             self.pathfindingPlot.__getPosInLayout__()[1],
             self.pathfindingPlot.__getPosInLayout__()[2],
             self.pathfindingPlot.__getPosInLayout__()[3])
+        self.layout.addWidget(
+            self.asserPlot.__getPlot__(),
+            self.asserPlot.__getPosInLayout__()[0],
+            self.asserPlot.__getPosInLayout__()[1],
+            self.asserPlot.__getPosInLayout__()[2],
+            self.asserPlot.__getPosInLayout__()[3])
 
     def showWindow(self):
         self.win.show()

@@ -19,6 +19,8 @@ class PathfindingPlot(MyPlot):
                             name="Obstacles")
         self.legend.addItem(item=pg.ScatterPlotItem(pen=None, size=35, brush='r', symbol='o'),
                             name="Robot")
+        self.legend.addItem(item=pg.ScatterPlotItem(pen=None, size=15, brush='w', symbol='x'),
+                            name="Target")
 
         # creation des variables receptrices des donnees
         self.DataObstacles = pg.ScatterPlotItem(pen=None, symbol='o',
@@ -213,6 +215,7 @@ class PathfindingPlot(MyPlot):
         self.processInputs_Path(inputs, debuggingApp)
 
     def updateData(self, infoRobot):
+        # update de la position du robot
         spots = []
         spots.append(
             {'pos': (infoRobot["position"][0],
@@ -222,6 +225,17 @@ class PathfindingPlot(MyPlot):
              'brush': 'r',
              'symbol': 'o'})
         self.DataPositionRobot.setData(spots)
+
+        # update de la target du robot
+        spots = []
+        spots.append(
+            {'pos': (infoRobot["target"][0],
+                     infoRobot["target"][1]),
+             'size': 15,
+             'pen': None,
+             'brush': 'w',
+             'symbol': 'x'})
+        self.DataTargetRobot.setData(spots)
 
     def refreshPlot(self):
         self.plotPathfinding.clear()

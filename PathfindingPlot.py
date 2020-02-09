@@ -55,7 +55,7 @@ class PathfindingPlot(MyPlot):
             self.processInputs_Obstacles(inputs, debuggingApp, spots)
 
         elif current == -102.0:
-            self.linesPath = []
+            self.linesRRT = []
             if debuggingApp:
                 print("reading RRT")
             self.processInputs_RRTBranches(inputs, debuggingApp)
@@ -105,8 +105,8 @@ class PathfindingPlot(MyPlot):
                     {'pos': (current, current2), 'size': 10, 'pen': None, 'brush': 'g', 'symbol': 'o'})
                 self.processInputs_Obstacles(inputs, debuggingApp, spots)
 
-    def processInputs_RRTBranches(self, inputs, debuggingApp): ²
-       if len(inputs) == 0:
+    def processInputs_RRTBranches(self, inputs, debuggingApp):
+        if len(inputs) == 0:
             print("erreur dans processInputs_RRTBranches. ID error : 1")
             return
 
@@ -120,39 +120,32 @@ class PathfindingPlot(MyPlot):
                 print("erreur dans processInputs_RRTBranches. ID error : 2")
             return
 
-        elif State == "READING RRT BRANCHES":
-            current = L.pop()
-            # print(current)
-            if current == -1:  # fin de la séquence
-                State = "INIT"
-                if printingInfo:
-                    print("init state")
-            else:
-                if len(L) < 3:
-                    print("erreur dans reading RRT branches. ID error : 1")
-                    State = "INIT"
-                    L.clear()
-                else:
-                    current2 = L.pop()
-                    if current2 < 0:
-                        State = "INIT"
-                        L.append(current2)
-                    else:
-                        current3 = L.pop()
-                        if current3 < 0:
-                            State = "INIT"
-                            L.append(current3)
-                        else:
-                            current4 = L.pop()
-                            if current4 < 0:
-                                State = "INIT"
-                                L.append(current4)
-                            else:
-                                # print(current2)
-                                # print(current3)
-                                # print(current4)
-                                linesRRT.append(pg.LineSegmentROI(
-                                    [[current, current2], [current3, current4]], pen=pg.mkPen('g', width=1)))
+        if len(inputs) < 3:
+            print("erreur dans reading RRT branches. ID error : 3")
+            inputs.clear()
+            return
+
+        current2 = inputs.pop()
+        if current2 < 0:
+            inputs.append(current2)
+            print("erreur dans reading RRT branches. ID error : 4")
+            return
+
+        current3 = inputs.pop()
+        if current3 < 0:
+            inputs.append(current3)
+            print("erreur dans reading RRT branches. ID error : 4")
+            return
+
+        current4 = inputs.pop()
+        if current4 < 0:
+            inputs.append(current4)
+            print("erreur dans reading RRT branches. ID error : 4")
+            return
+
+        self.linesRRT.append(pg.LineSegmentROI(
+            [[current, current2], [current3, current4]], pen=pg.mkPen('g', width=1)))
+        self.processInputs_RRTBranches(inputs, debuggingApp)
 
     def processInputs_NodeCount(self, inputs, debuggingApp):
         pass
@@ -181,6 +174,7 @@ class PathfindingPlot(MyPlot):
             self.plotPathfinding.addItem(self.linesPath[i])
         for i in range(0, len(self.linesRRT)):
             self.plotPathfinding.addItem(self.linesRRT[i])
+
 
 """
         elif State == "READING NODE COUNT":

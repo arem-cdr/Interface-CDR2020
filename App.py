@@ -1,10 +1,12 @@
+import time
+
 from InterfaceDebug import InterfaceDebug
 
 
 class App:
     def __init__(self):
         # debuggingApp : variable utilisee pour print des infos sur l'app lors du debug
-        self.debuggingApp = True
+        self.debuggingApp = False
 
         self.interfaceDebug = InterfaceDebug()
         self.inputs = []
@@ -13,6 +15,9 @@ class App:
                           "target": [0, 0],
                           "vitesse": [0, 0],
                           "time": 0.0}
+
+        self.creationTime = time.time()*1000
+        self.lastRefreshTime = time.time()*1000
 
         self.interfaceDebug.showWindow()
 
@@ -149,5 +154,8 @@ class App:
     def updatePlotsInfoRobot(self):
         self.interfaceDebug.updatePlotsInfoRobot(self.infoRobot)
 
-    def refresh(self):
-        self.interfaceDebug.refreshPlot()
+    def refresh(self, QtGui):
+        if time.time()*1000 - self.lastRefreshTime > 300:
+            self.interfaceDebug.refreshPlot()
+            QtGui.QApplication.processEvents()
+            self.lastRefreshTime = time.time()*1000

@@ -6,6 +6,7 @@ import pyqtgraph as pg
 import numpy
 import time
 from math import *
+import cProfile
 
 from App import App
 
@@ -14,12 +15,14 @@ ser = serial.Serial('com8', 2000000)
 
 app = App()
 
+QtGui.QApplication.processEvents()
+
 while True:
-    QtGui.QApplication.processEvents()
+    # for i in range(0, 10000): # pour profiling dans cmd : "python -m cProfile -s cumtime Main2.py" et pour clear terminal : "cls"
     app.readInput(ser)
     app.processInputs()
     app.updatePlotsInfoRobot()
-    app.refresh()
+    app.refresh(QtGui)
 
 QtGui.QApplication.processEvents()
-app.exec_()
+# app.exec_()

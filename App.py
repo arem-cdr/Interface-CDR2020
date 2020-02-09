@@ -155,7 +155,7 @@ class App:
         self.interfaceDebug.updatePlotsInfoRobot(self.infoRobot)
 
     def refresh(self, QtGui):
-        if time.time()*1000 - self.lastRefreshTime > 300:
+        if time.time()*1000 - self.lastRefreshTime > 80:
             self.interfaceDebug.refreshPlot()
             QtGui.QApplication.processEvents()
             self.lastRefreshTime = time.time()*1000

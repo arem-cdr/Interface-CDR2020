@@ -7,6 +7,7 @@ from MyPlot import MyPlot
 class PathfindingPlot(MyPlot):
     def __init__(self):
         MyPlot.__init__(self)
+        self.nodeCount = 0
 
         self.posInLayout = [0, 0, 1, 1]
         self.plotPathfinding.getPlotItem().setTitle("Pathfinding")
@@ -66,6 +67,7 @@ class PathfindingPlot(MyPlot):
             self.processInputs_NodeCount(inputs, debuggingApp)
 
         elif current == -104.0:
+            self.linesPath = []
             if debuggingApp:
                 print("reading path")
             self.processInputs_Path(inputs, debuggingApp)
@@ -148,10 +150,67 @@ class PathfindingPlot(MyPlot):
         self.processInputs_RRTBranches(inputs, debuggingApp)
 
     def processInputs_NodeCount(self, inputs, debuggingApp):
-        pass
+        if len(inputs) == 0:
+            print("erreur dans processInputs_NodeCount. ID error : 1")
+            return
+
+        current = inputs.pop()
+
+        if current < 0 or len(inputs) == 0:
+            if current == -1.0:  # fin de la séquence
+                if debuggingApp:
+                    print("fin de la séquence")
+            else:
+                print("erreur dans processInputs_NodeCount. ID error : 2")
+            return
+
+        else:
+            self.nodeCount = current
+            if debuggingApp:
+                print("node count : ", self.nodeCount)
+            self.processInputs_NodeCount(inputs, debuggingApp)
 
     def processInputs_Path(self, inputs, debuggingApp):
-        pass
+        if len(inputs) == 0:
+            print("erreur dans processInputs_Path. ID error : 1")
+            return
+
+        current = inputs.pop()
+
+        if current < 0 or len(inputs) == 0:
+            if current == -1.0:  # fin de la séquence
+                if debuggingApp:
+                    print("fin de la séquence")
+            else:
+                print("erreur dans processInputs_Path. ID error : 2")
+            return
+
+        if len(inputs) < 3:
+            print("erreur dans reading Path. ID error : 3")
+            inputs.clear()
+            return
+
+        current2 = inputs.pop()
+        if current2 < 0:
+            inputs.append(current2)
+            print("erreur dans reading Path. ID error : 4")
+            return
+
+        current3 = inputs.pop()
+        if current3 < 0:
+            inputs.append(current3)
+            print("erreur dans reading Path. ID error : 4")
+            return
+
+        current4 = inputs.pop()
+        if current4 < 0:
+            inputs.append(current4)
+            print("erreur dans reading Path. ID error : 4")
+            return
+
+        self.linesPath.append(pg.LineSegmentROI(
+            [[current, current2], [current3, current4]], pen=pg.mkPen('r', width=1)))
+        self.processInputs_Path(inputs, debuggingApp)
 
     def updateData(self, infoRobot):
         spots = []
@@ -174,62 +233,3 @@ class PathfindingPlot(MyPlot):
             self.plotPathfinding.addItem(self.linesPath[i])
         for i in range(0, len(self.linesRRT)):
             self.plotPathfinding.addItem(self.linesRRT[i])
-
-
-"""
-        elif State == "READING NODE COUNT":
-            current = L.pop()
-            if current < 0 or len(L) == 0:
-                if current == -1:  # fin de la séquence
-                    State = "INIT"
-                    if printingInfo:
-                        print("init state")
-                else:
-                    print("erreur dans reading node count")
-            else:
-                print("node count : ", current)
-"""
-
-
-"""
-        elif State == "READING PATH":
-              current = L.pop()
-               if current == -1:  # fin de la séquence
-                    State = "INIT"
-                    if printingInfo:
-                        print("init state")
-                else:
-                    if len(L) < 3:
-                        print("erreur dans reading Path. ID error : 1")
-                        State = "INIT"
-                        L.clear()
-                    else:
-                        current2 = L.pop()
-                        if current2 < 0:
-                            State = "INIT"
-                            L.append(current2)
-                        else:
-                            current3 = L.pop()
-                            if current3 < 0:
-                                State = "INIT"
-                                L.append(current3)
-                            else:
-                                current4 = L.pop()
-                                if current4 < 0:
-                                    State = "INIT"
-                                    L.append(current4)
-                                else:
-                                    linesPath.append(pg.LineSegmentROI(
-                                        [[current, current2], [current3, current4]], pen=pg.mkPen('r', width=1)))
-"""
-
-"""
-    self.DataObstacles = pg.ScatterPlotItem(pen=None, symbol='o',
-                                                symbolPen=None, symbolBrush='r')
-        self.DataPositionRobot = pg.ScatterPlotItem(pen=None, symbol='o',
-                                                    symbolPen=None, symbolBrush='r')
-        self.DataTargetRobot = pg.ScatterPlotItem(pen=None, symbol='o',
-                                                  symbolPen=None, symbolBrush='r')
-        self.linesRRT = []
-        self.linesPath = []
-    """

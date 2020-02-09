@@ -3,9 +3,11 @@
 import serial
 from pyqtgraph.Qt import QtGui, QtCore
 import pyqtgraph as pg
-import numpy as np
+import numpy
 import time
 from math import *
+
+from App import App
 
 # init serial
 ser = serial.Serial('com8', 2000000)
@@ -54,7 +56,7 @@ plotPathfinding.setYRange(0, 200)
 # plot goes on right side, spanning 3 rows
 layout.addWidget(plotPathfinding, 0, 0, 1, 1)
 
-# plot assez
+# plot asser
 plotAsser = pg.PlotWidget()
 layout.addWidget(plotAsser, 0, 1, 1, 1)
 

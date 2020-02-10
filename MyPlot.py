@@ -4,13 +4,13 @@ import pyqtgraph as pg
 
 class MyPlot():
     def __init__(self):
-        self.plotPathfinding = pg.PlotWidget()
+        self.plotWidget = pg.PlotWidget()
         self.posInLayout = {0, 0, 1, 1}
 
-        self.plotPathfinding.getPlotItem().setTitle("Default")
+        self.plotWidget.getPlotItem().setTitle("Default")
 
     def __getPlot__(self):
-        return self.plotPathfinding
+        return self.plotWidget
 
     def __getPosInLayout__(self):
         return self.posInLayout

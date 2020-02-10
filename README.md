@@ -15,7 +15,9 @@ Ce code servira à suivre en temps réel les variables internes du robot. Il tou
 
 **:clipboard: ToDo:**
 -
-- [ ] Créer une nouvelle classe AsserPlot permettant d'afficher un graphique qui aiderait à debug l'asser
+- [X] Créer une nouvelle classe AsserPlot permettant d'afficher un graphique qui aiderait à debug l'asser
+- [ ] Implémenter les séquences supportées par la classe AsserPlot
+- [ ] Créer une classe permettant d'afficher des info diverses modulable 
 
 
 ---

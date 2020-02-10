@@ -9,11 +9,11 @@ class PathfindingPlot(MyPlot):
         self.nodeCount = 0
 
         self.posInLayout = [0, 0, 1, 1]
-        self.plotPathfinding.getPlotItem().setTitle("Pathfinding")
+        self.plotWidget.getPlotItem().setTitle("Pathfinding")
 
         # creation de la legende
         self.legend = pg.LegendItem(size=(100, 50), offset=(40, 10))
-        self.legend.setParentItem(self.plotPathfinding.graphicsItem())
+        self.legend.setParentItem(self.plotWidget.graphicsItem())
         self.legend.addItem(item=pg.ScatterPlotItem(pen=None, size=10, brush='g', symbol='o'),
                             name="Obstacles")
         self.legend.addItem(item=pg.ScatterPlotItem(pen=None, size=35, brush='r', symbol='o'),
@@ -34,17 +34,17 @@ class PathfindingPlot(MyPlot):
         self.previousLinesPath = []
 
         # ajout des donnees au plot
-        self.plotPathfinding.addItem(self.DataObstacles)
-        self.plotPathfinding.addItem(self.DataPositionRobot)
-        self.plotPathfinding.addItem(self.DataTargetRobot)
+        self.plotWidget.addItem(self.DataObstacles)
+        self.plotWidget.addItem(self.DataPositionRobot)
+        self.plotWidget.addItem(self.DataTargetRobot)
         for i in range(0, len(self.linesPath)):
-            self.plotPathfinding.addItem(self.linesPath[i])
+            self.plotWidget.addItem(self.linesPath[i])
         for i in range(0, len(self.linesRRT)):
-            self.plotPathfinding.addItem(self.linesRRT[i])
+            self.plotWidget.addItem(self.linesRRT[i])
 
         # dimensions du plot
-        self.plotPathfinding.setXRange(0, 300)
-        self.plotPathfinding.setYRange(0, 200)
+        self.plotWidget.setXRange(0, 300)
+        self.plotWidget.setYRange(0, 200)
 
     def processInputs_Pathfinding(self, inputs, debuggingApp):
         if len(inputs) == 0:
@@ -212,7 +212,7 @@ class PathfindingPlot(MyPlot):
             return
 
         self.linesPath.append(pg.LineSegmentROI(
-            [[current, current2], [current3, current4]], pen=pg.mkPen('r', width=1)))
+            [[current, current2], [current3, current4]], pen=pg.mkPen(color=(200, 150, 150), width=2, style=None)))
         self.processInputs_Path(inputs, debuggingApp)
 
     def updateData(self, infoRobot):
@@ -241,14 +241,14 @@ class PathfindingPlot(MyPlot):
     def refreshPlot(self):
         # refreshing path
         for i in range(0, len(self.previousLinesPath)):
-            self.plotPathfinding.removeItem(self.previousLinesPath[i])
+            self.plotWidget.removeItem(self.previousLinesPath[i])
         for i in range(0, len(self.linesPath)):
-            self.plotPathfinding.addItem(self.linesPath[i])
+            self.plotWidget.addItem(self.linesPath[i])
         self.previousLinesPath = self.linesPath
 
         # refreshing RRT
         for i in range(0, len(self.previousLinesRRT)):
-            self.plotPathfinding.removeItem(self.previousLinesRRT[i])
+            self.plotWidget.removeItem(self.previousLinesRRT[i])
         for i in range(0, len(self.linesRRT)):
-            self.plotPathfinding.addItem(self.linesRRT[i])
+            self.plotWidget.addItem(self.linesRRT[i])
         self.previousLinesRRT = self.linesRRT

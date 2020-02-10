@@ -1,6 +1,5 @@
 
 from pyqtgraph.Qt import QtGui, QtCore
-import pyqtgraph as pg
 
 from PathfindingPlot import PathfindingPlot
 from AsserPlot import AsserPlot

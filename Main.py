@@ -3,14 +3,11 @@
 import serial
 from pyqtgraph.Qt import QtGui, QtCore
 import pyqtgraph as pg
-import numpy
-import time
-from math import *
 import cProfile  # lib utilisee pour le profiling
 
 from App import App
 
-ser = serial.Serial('com8', 2000000)
+ser = serial.Serial('com5', 2000000)
 
 app = App()
 

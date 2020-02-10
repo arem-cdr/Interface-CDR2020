@@ -29,9 +29,9 @@ class PathfindingPlot(MyPlot):
         self.DataTargetRobot = pg.ScatterPlotItem(pen=None, symbol='o',
                                                   symbolPen=None, symbolBrush='r')
         self.linesRRT = []
-        self.linesRRTMaxSize = 0
+        self.previousLinesRRT = []
         self.linesPath = []
-        self.linesPathMaxSize = 0
+        self.previousLinesPath = []
 
         # ajout des donnees au plot
         self.plotPathfinding.addItem(self.DataObstacles)
@@ -121,7 +121,6 @@ class PathfindingPlot(MyPlot):
             if current == -1.0:  # fin de la séquence
                 if debuggingApp:
                     print("fin de la séquence")
-                self.linesRRTMaxSize = len(self.linesRRT)
             else:
                 print("erreur dans processInputs_RRTBranches. ID error : 2")
             return
@@ -185,7 +184,6 @@ class PathfindingPlot(MyPlot):
             if current == -1.0:  # fin de la séquence
                 if debuggingApp:
                     print("fin de la séquence")
-                self.linesPathMaxSize = len(self.linesPath)
             else:
                 print("erreur dans processInputs_Path. ID error : 2")
             return
@@ -241,12 +239,16 @@ class PathfindingPlot(MyPlot):
         self.DataTargetRobot.setData(spots)
 
     def refreshPlot(self):
-        self.plotPathfinding.clear()
-
-        self.plotPathfinding.addItem(self.DataObstacles)
-        self.plotPathfinding.addItem(self.DataPositionRobot)
-        self.plotPathfinding.addItem(self.DataTargetRobot)
+        # refreshing path
+        for i in range(0, len(self.previousLinesPath)):
+            self.plotPathfinding.removeItem(self.previousLinesPath[i])
         for i in range(0, len(self.linesPath)):
             self.plotPathfinding.addItem(self.linesPath[i])
+        self.previousLinesPath = self.linesPath
+
+        # refreshing RRT
+        for i in range(0, len(self.previousLinesRRT)):
+            self.plotPathfinding.removeItem(self.previousLinesRRT[i])
         for i in range(0, len(self.linesRRT)):
             self.plotPathfinding.addItem(self.linesRRT[i])
+        self.previousLinesRRT = self.linesRRT

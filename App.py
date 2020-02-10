@@ -169,6 +169,6 @@ class App:
         self.interfaceDebug.updatePlotsInfoRobot(self.infoRobot)
 
     def refresh(self):
-        if time.time()*1000 - self.lastRefreshTime > 300:
-            # self.interfaceDebug.refreshPlot()
+        if time.time()*1000 - self.lastRefreshTime > 150:
+            self.interfaceDebug.refreshPlot()
             self.lastRefreshTime = time.time()*1000

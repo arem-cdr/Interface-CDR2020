@@ -1,4 +1,3 @@
-from pyqtgraph.Qt import QtGui, QtCore
 import pyqtgraph as pg
 
 from MyPlot import MyPlot
@@ -30,7 +29,9 @@ class PathfindingPlot(MyPlot):
         self.DataTargetRobot = pg.ScatterPlotItem(pen=None, symbol='o',
                                                   symbolPen=None, symbolBrush='r')
         self.linesRRT = []
+        self.linesRRTMaxSize = 0
         self.linesPath = []
+        self.linesPathMaxSize = 0
 
         # ajout des donnees au plot
         self.plotPathfinding.addItem(self.DataObstacles)
@@ -120,6 +121,7 @@ class PathfindingPlot(MyPlot):
             if current == -1.0:  # fin de la séquence
                 if debuggingApp:
                     print("fin de la séquence")
+                self.linesRRTMaxSize = len(self.linesRRT)
             else:
                 print("erreur dans processInputs_RRTBranches. ID error : 2")
             return
@@ -183,6 +185,7 @@ class PathfindingPlot(MyPlot):
             if current == -1.0:  # fin de la séquence
                 if debuggingApp:
                     print("fin de la séquence")
+                self.linesPathMaxSize = len(self.linesPath)
             else:
                 print("erreur dans processInputs_Path. ID error : 2")
             return

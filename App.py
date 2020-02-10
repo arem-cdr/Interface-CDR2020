@@ -1,3 +1,5 @@
+from pyqtgraph.Qt import QtGui, QtCore
+import serial
 import time
 
 from InterfaceDebug import InterfaceDebug
@@ -7,7 +9,10 @@ class App:
     def __init__(self):
         # debuggingApp : variable utilisee pour print des infos sur l'app lors du debug
         self.debuggingApp = False
-        self.isOpen = True
+        self.doneLoop = True
+
+        # remplacer "com8" ligne 10 par le port com utilise. rappel : "python -m serial.tools.list_ports -v" pour lister les ports com disponibles
+        self.ser = serial.Serial('com8', 2000000)
 
         self.interfaceDebug = InterfaceDebug()
         self.inputs = []
@@ -21,8 +26,17 @@ class App:
 
         self.interfaceDebug.showWindow()
 
-    def readInput(self, serial):
-        ser_bytes = serial.readline()
+    def loop(self):
+        if self.doneLoop:
+            self.doneLoop = False
+            self.readInput()
+            self.processInputs()
+            self.updatePlotsInfoRobot()
+            self.refresh()
+            self.doneLoop = True
+
+    def readInput(self):
+        ser_bytes = self.ser.readline()
         decoded_byte = 0
         try:
             decoded_byte = float(ser_bytes[0:len(ser_bytes)-2].decode("utf-8"))
@@ -154,8 +168,7 @@ class App:
     def updatePlotsInfoRobot(self):
         self.interfaceDebug.updatePlotsInfoRobot(self.infoRobot)
 
-    def refresh(self, QtGui):
-        if time.time()*1000 - self.lastRefreshTime > 80:
-            self.interfaceDebug.refreshPlot()
-            QtGui.QApplication.processEvents()
+    def refresh(self):
+        if time.time()*1000 - self.lastRefreshTime > 300:
+            # self.interfaceDebug.refreshPlot()
             self.lastRefreshTime = time.time()*1000

@@ -1,5 +1,6 @@
 
 from pyqtgraph.Qt import QtGui, QtCore
+import sys
 
 from PathfindingPlot import PathfindingPlot
 from AsserPlot import AsserPlot
@@ -55,3 +56,4 @@ class InterfaceDebug:
 
     def refreshPlot(self):
         self.pathfindingPlot.refreshPlot()
+        # sys.exit(True)

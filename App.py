@@ -7,10 +7,10 @@ class App:
     def __init__(self):
         # debuggingApp : variable utilisee pour print des infos sur l'app lors du debug
         self.debuggingApp = False
+        self.isOpen = True
 
         self.interfaceDebug = InterfaceDebug()
         self.inputs = []
-        self.state = "INIT"
         self.infoRobot = {"position": [0, 0],
                           "target": [0, 0],
                           "vitesse": [0, 0],

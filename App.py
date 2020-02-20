@@ -1,6 +1,7 @@
 from pyqtgraph.Qt import QtGui, QtCore
 import serial
 import time
+import sys
 
 from InterfaceDebug import InterfaceDebug
 
@@ -12,8 +13,16 @@ class App:
         self.doneLoop = True
 
         # remplacer "com8" ligne 10 par le port com utilise. rappel : "python -m serial.tools.list_ports -v" pour lister les ports com disponibles
-        self.ser = serial.Serial('com8', 2000000)
+        self.baudrate = 2000000
+        self.timeout = 0.05
 
+        # ouverture du port serie
+        # print(self.availablePorts())
+        if self.availablePorts():
+            self.ser = serial.Serial(
+                self.availablePorts()[0], self.baudrate, timeout=self.timeout)
+
+        # creation de l'interface graphique et de ses variables
         self.interfaceDebug = InterfaceDebug()
         self.inputs = []
         self.infoRobot = {"position": [0, 0],
@@ -21,32 +30,59 @@ class App:
                           "vitesse": [0, 0],
                           "time": 0.0}
 
-        self.creationTime = time.time()*1000
-        self.lastRefreshTime = time.time()*1000
+        self.creationTime = time.time() * 1000
+        self.lastFrameTime = time.time() * 1000
 
         self.interfaceDebug.showWindow()
 
+    def availablePorts(self):
+        # Lists serial ports
+
+        if sys.platform.startswith('win'):
+            ports = ['COM' + str(i + 1) for i in range(256)]
+        elif sys.platform.startswith('linux') or sys.platform.startswith('cygwin'):
+            # this is to exclude your current terminal "/dev/tty"
+            ports = glob.glob('/dev/tty[A-Za-z]*')
+        elif sys.platform.startswith('darwin'):
+            ports = glob.glob('/dev/tty.*')
+        else:
+            raise EnvironmentError('Unsupported platform')
+
+        result = []
+        for port in ports:
+            try:
+                s = serial.Serial(port)
+                s.close()
+                result.append(port)
+            except (OSError, serial.SerialException):
+                pass
+        return result
+
     def loop(self):
-        if self.doneLoop:
+        if self.doneLoop and self.ser.is_open:
             self.doneLoop = False
             self.readInput()
             self.processInputs()
-            self.updatePlotsInfoRobot()
-            self.refresh()
+            if time.time() * 1000 - self.lastFrameTime > 50 and not(self.interfaceDebug.pauseButton.isChecked()):
+                self.updatePlotsInfoRobot()
+                self.refresh()
+                self.lastFrameTime = time.time() * 1000
             self.doneLoop = True
 
     def readInput(self):
         ser_bytes = self.ser.readline()
         decoded_byte = 0
-        try:
-            decoded_byte = float(ser_bytes[0:len(ser_bytes)-2].decode("utf-8"))
-        except ValueError:
-            if self.debuggingApp:
-                print("Failed to convert string to float")
-        self.inputs.insert(0, decoded_byte)
+        if len(ser_bytes) > 1:
+            try:
+                decoded_byte = int(ser_bytes[0:len(ser_bytes)-1])
+            except ValueError:
+                if self.debuggingApp:
+                    print("convertion Failed")
+                    print(ser_bytes)
+            self.inputs.insert(0, decoded_byte)
 
     def processInputs(self):
-        if len(self.inputs) == 0:
+        if len(self.inputs) < 2:
             return
 
         if self.inputs[0] == -1:  # -1 marque la fin d'une séquence de donnees
@@ -58,61 +94,51 @@ class App:
             while len(self.inputs) > 0:
                 current = self.inputs[len(self.inputs) - 1]
 
-                if current >= 0:
-                    print("erreur : sequence de donnee non definie. id : App.py l.38")
+                if current >= -1:
                     self.inputs.pop()
                 else:
                     if current >= -100:
-                        self.processInputs_InfoRobot()
+                        self.processInputs_GeneralInfo()
                     else:
                         self.interfaceDebug.processInputs(
                             self.inputs, self.debuggingApp)
 
-    def processInputs_InfoRobot(self):
+    def processInputs_GeneralInfo(self):
         if len(self.inputs) == 0:
-            print("erreur dans processInputs_InfoRobot : input vide")
             return
 
         current = self.inputs.pop()
 
-        if current == -2.0:
-            if self.debuggingApp:
-                print("reading current position")
+        if current == -1:
+            return
+
+        if current == -2:
+            self.reset()
+
+        if current == -3:
             self.processInputs_RobotPosition()
 
-        elif current == -3.0:
-            if self.debuggingApp:
-                print("reading current target")
+        elif current == -4:
             self.processInputs_RobotTarget()
 
-        elif current == -4.0:
-            if self.debuggingApp:
-                print("reading time")
+        elif current == -5:
             self.processInputs_Time()
 
         else:
-            print("sequence de données inconnue. code de donnée : ", current)
             self.inputs.clear()
 
     def processInputs_RobotPosition(self):
         if len(self.inputs) == 0:
-            print("erreur dans processInputs_RobotPosition. ID error : 1")
             return
 
         current = self.inputs.pop()
 
         if current < 0 or len(self.inputs) == 0:
-            if current == -1.0:  # fin de la séquence
-                if self.debuggingApp:
-                    print("fin de la séquence")
-            else:
-                print("erreur dans processInputs_RobotPosition. ID error : 2")
             return
 
         else:
             current2 = self.inputs.pop()
             if current2 < 0:
-                print("erreur dans processInputs_RobotPosition. ID error : 3")
                 self.inputs.append(current2)
                 return
             else:
@@ -121,54 +147,41 @@ class App:
 
     def processInputs_RobotTarget(self):
         if len(self.inputs) == 0:
-            print("erreur dans processInputs_RobotTarget. ID error : 1")
             return
 
         current = self.inputs.pop()
 
         if current < 0 or len(self.inputs) == 0:
-            if current == -1.0:  # fin de la séquence
-                if self.debuggingApp:
-                    print("fin de la séquence")
-            else:
-                print("erreur dans processInputs_RobotTarget. ID error : 2")
             return
 
+        current2 = self.inputs.pop()
+        if current2 < 0:
+            self.inputs.append(current2)
+            return
         else:
-            current2 = self.inputs.pop()
-            if current2 < 0:
-                print("erreur dans processInputs_RobotTarget. ID error : 3")
-                self.inputs.append(current2)
-                return
-            else:
-                self.infoRobot["target"] = [current, current2]
-                self.processInputs_RobotTarget()
+            self.infoRobot["target"] = [current, current2]
+            self.processInputs_RobotTarget()
 
     def processInputs_Time(self):
         if len(self.inputs) == 0:
-            print("erreur dans processInputs_Time. ID error : 1")
             return
 
         current = self.inputs.pop()
 
         if current < 0 or len(self.inputs) == 0:
-            if current == -1.0:  # fin de la séquence
-                if self.debuggingApp:
-                    print("fin de la séquence")
-            else:
-                print("erreur dans processInputs_RobotTarget. ID error : 2")
             return
 
         else:
             self.infoRobot["time"] = current
-            if self.debuggingApp:
-                print("current time : ", self.infoRobot["time"])
             self.processInputs_Time()
 
     def updatePlotsInfoRobot(self):
         self.interfaceDebug.updatePlotsInfoRobot(self.infoRobot)
 
     def refresh(self):
-        if time.time()*1000 - self.lastRefreshTime > 150:
-            self.interfaceDebug.refreshPlot()
-            self.lastRefreshTime = time.time()*1000
+        self.interfaceDebug.refreshPlot()
+        self.lastRefreshTime = time.time() * 1000
+
+    def reset(self):
+        print("reset")
+        self.interfaceDebug.reset()

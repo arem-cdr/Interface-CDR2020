@@ -5,6 +5,8 @@ import sys
 
 from InterfaceDebug import InterfaceDebug
 
+FRAME_RATE = 10
+
 
 class App:
     def __init__(self):
@@ -14,7 +16,7 @@ class App:
 
         # remplacer "com8" ligne 10 par le port com utilise. rappel : "python -m serial.tools.list_ports -v" pour lister les ports com disponibles
         self.baudrate = 2000000
-        self.timeout = 0.05
+        self.timeout = 0.01
 
         # ouverture du port serie
         # print(self.availablePorts())
@@ -63,7 +65,7 @@ class App:
             self.doneLoop = False
             self.readInput()
             self.processInputs()
-            if time.time() * 1000 - self.lastFrameTime > 50 and not(self.interfaceDebug.pauseButton.isChecked()):
+            if time.time() * 1000 - self.lastFrameTime > 1 / FRAME_RATE * 1000 and not(self.interfaceDebug.pauseButton.isChecked()):
                 self.updatePlotsInfoRobot()
                 self.refresh()
                 self.lastFrameTime = time.time() * 1000

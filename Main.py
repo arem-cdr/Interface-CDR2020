@@ -11,7 +11,7 @@ QtGui.QApplication.processEvents()
 # Update data display
 timer = QtCore.QTimer()
 timer.timeout.connect(app.loop)
-timer.start(0.01)
+timer.start(0.0001)
 
 if __name__ == '__main__':
     QtGui.QApplication.instance().exec_()

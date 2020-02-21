@@ -4,8 +4,8 @@ import time
 import sys
 
 from InterfaceDebug import InterfaceDebug
-
-FRAME_RATE = 10
+FRAME_RATE2 = 100
+FRAME_RATE = 5
 
 
 class App:
@@ -16,13 +16,13 @@ class App:
 
         # remplacer "com8" ligne 10 par le port com utilise. rappel : "python -m serial.tools.list_ports -v" pour lister les ports com disponibles
         self.baudrate = 2000000
-        self.timeout = 0.01
+        self.timeout = 0.001
 
         # ouverture du port serie
         # print(self.availablePorts())
-        if self.availablePorts():
-            self.ser = serial.Serial(
-                self.availablePorts()[0], self.baudrate, timeout=self.timeout)
+    
+        self.ser = serial.Serial(
+                '/dev/ttyACM0', self.baudrate, timeout=self.timeout)
 
         # creation de l'interface graphique et de ses variables
         self.interfaceDebug = InterfaceDebug()
@@ -34,45 +34,31 @@ class App:
 
         self.creationTime = time.time() * 1000
         self.lastFrameTime = time.time() * 1000
+        self.lastread = time.time() * 1000
 
         self.interfaceDebug.showWindow()
 
-    def availablePorts(self):
-        # Lists serial ports
-
-        if sys.platform.startswith('win'):
-            ports = ['COM' + str(i + 1) for i in range(256)]
-        elif sys.platform.startswith('linux') or sys.platform.startswith('cygwin'):
-            # this is to exclude your current terminal "/dev/tty"
-            ports = glob.glob('/dev/tty[A-Za-z]*')
-        elif sys.platform.startswith('darwin'):
-            ports = glob.glob('/dev/tty.*')
-        else:
-            raise EnvironmentError('Unsupported platform')
-
-        result = []
-        for port in ports:
-            try:
-                s = serial.Serial(port)
-                s.close()
-                result.append(port)
-            except (OSError, serial.SerialException):
-                pass
-        return result
 
     def loop(self):
-        if self.doneLoop and self.ser.is_open:
-            self.doneLoop = False
-            self.readInput()
-            self.processInputs()
+        if self.ser.is_open:
+            
+            
             if time.time() * 1000 - self.lastFrameTime > 1 / FRAME_RATE * 1000 and not(self.interfaceDebug.pauseButton.isChecked()):
                 self.updatePlotsInfoRobot()
                 self.refresh()
                 self.lastFrameTime = time.time() * 1000
-            self.doneLoop = True
+                self.ser.reset_input_buffer()
+            if time.time() *1000 - self.lastread > 1 / FRAME_RATE2:
+                
+                self.readInput()
+                self.processInputs()
+                self.lastread = time.time() * 1000
+ 
+            
 
     def readInput(self):
         ser_bytes = self.ser.readline()
+        
         decoded_byte = 0
         if len(ser_bytes) > 1:
             try:
@@ -128,6 +114,7 @@ class App:
 
         else:
             self.inputs.clear()
+        
 
     def processInputs_RobotPosition(self):
         if len(self.inputs) == 0:
